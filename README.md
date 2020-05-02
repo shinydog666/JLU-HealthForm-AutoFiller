@@ -5,10 +5,15 @@
 ## 使用方法
   1. 修改config.ini中的userName和passWord字段，其中username为用户名，即去掉@mails.jlu.edu.cn后的邮箱名；
   password为密码。
-  2. 右键管理员运行install.bat即可开机启动，如果不想开机启动也可以直接运行程序。
-  3. 如果需要自定义浏览器位置，请修改b = webdriver.Chrome()一行，改为Chrome
+  2. 右键管理员运行win-install.cmd即可开机启动，如果不想开机启动也可以直接运行程序。
+  3. 如果需要自定义浏览器，请修改b = webdriver.Chrome()一行，改为Firefox等也可。
   4. 请在[这里](http://npm.taobao.org/mirrors/chromedriver/) 下载对应浏览器版本的ChromeDriver，放到Python安装目录下（Python目录一般已经加入
   到Path变量中，这里是为了方便，如果需要放到其它目录请将对应目录加入Path变量）。
   
 ## 已知问题
   1. 闰年、闰月的时候可能会出问题，就像今年各大软件出现的问题一样。
+  2. Windows服务无法启动，但是进程里面有进程，不知道怎么回事。
+  
+## 待办事项
+  1.[ ] 自动填表（自动读取已经填好的内容并且保存待下次填写）
+  2.[ ] Linux/macOS开机启动脚本

@@ -1,7 +1,8 @@
 from email.header import Header
 from email.mime.text import MIMEText
 from urllib import parse
-import requests, smtplib
+import smtplib
+from requests import get,post
 
 
 class MessageSender(object):

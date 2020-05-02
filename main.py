@@ -1,30 +1,26 @@
-"""
-
-https://ehall.jlu.edu.cn/infoplus/form/JLDX_BK_XNYQSB/start
-
-"""
 import configparser
 import datetime
-
 import MessageSender
 
 m = MessageSender.MessageSender("Bark")
-
-# in macOS or Linux, use this.
 import time
-from tkinter import messagebox
+# in macOS or Linux, use this.
+# from tkinter import messagebox
+
 import logging
 
 l = logging.getLogger(__name__)
 
 from selenium import webdriver
-# in Windows, use this.
-import win32api, win32con
+
+# in Windows, use these.
+from win32api import MessageBox
+from win32con import MB_OK
 
 # in macOS or Linux, use this.
-# messagebox.showinfo("本程序由ForeverOpp制作，一切后果本人概不负责。https://github.com/ForeverOpp", "警告")
+# messagebox.showinfo("警告", "本程序由ForeverOpp制作，一切后果本人概不负责。https://github.com/ForeverOpp")
 # in Windows, use this.
-win32api.MessageBox(0, "本程序由ForeverOpp制作，一切后果本人概不负责。https://github.com/ForeverOpp", "警告", win32con.MB_OK)
+MessageBox(0, "本程序由ForeverOpp制作，一切后果本人概不负责。https://github.com/ForeverOpp", "警告", MB_OK)
 """
 
 自定义函数区
@@ -72,6 +68,7 @@ methodKey = cfg.get("program", method.lower())
 title = cfg.get("common", "title")
 content = cfg.get("common", "content")
 timeout = int(cfg.get("common", "timeout"))
+chromeDriver = cfg.get("common", "chromeDriver")
 
 l.info("配置内容：")
 for i in cfg.sections():
@@ -83,10 +80,11 @@ m.setMethod(method)
 m.config({methodKey: apiKey})
 
 # 配置浏览器
-b = webdriver.Chrome()
-
+b = webdriver.Chrome(executable_path=chromeDriver)
+b.minimize_window()
 # 开始程序主逻辑
 while (True):
+    b.minimize_window()
     if not (int(getDiff(rTimeS)) <= diff):
         l.warning("时候未到，休息1小时")
         time.sleep(1 * 60 * 60)
