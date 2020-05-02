@@ -7,30 +7,31 @@ import configparser
 import datetime
 
 import MessageSender
-m = MessageSender.MessageSender("Bark")
 
+m = MessageSender.MessageSender("Bark")
 
 # in macOS or Linux, use this.
 import time
 from tkinter import messagebox
 import logging
+
 l = logging.getLogger(__name__)
 
 from selenium import webdriver
 # in Windows, use this.
-import win32api,win32con
-
-
+import win32api, win32con
 
 # in macOS or Linux, use this.
-#messagebox.showinfo("Test", "sss")
+# messagebox.showinfo("本程序由ForeverOpp制作，一切后果本人概不负责。https://github.com/ForeverOpp", "警告")
 # in Windows, use this.
-win32api.MessageBox(0, "这是一个测试提醒OK消息框", "提醒",win32con.MB_OK)
+win32api.MessageBox(0, "本程序由ForeverOpp制作，一切后果本人概不负责。https://github.com/ForeverOpp", "警告", win32con.MB_OK)
 """
 
 自定义函数区
 
 """
+
+
 def getDiff(rTimeS):
     rTime = datetime.datetime.strptime(rTimeS, "%Y-%m-%d %H:%M:%S")
     nTime = datetime.datetime.now()
@@ -39,8 +40,6 @@ def getDiff(rTimeS):
     else:
         result = (nTime - rTime).seconds / 60
     return result
-
-
 
 
 """
@@ -72,7 +71,7 @@ method = cfg.get("common", "method")
 methodKey = cfg.get("program", method.lower())
 title = cfg.get("common", "title")
 content = cfg.get("common", "content")
-#m.send({"title": title, "content": content})
+timeout = int(cfg.get("common", "timeout"))
 
 l.info("配置内容：")
 for i in cfg.sections():
@@ -83,26 +82,29 @@ for i in cfg.sections():
 m.setMethod(method)
 m.config({methodKey: apiKey})
 
-
-
-
-
-
-
-
-
-
-
+# 配置浏览器
+b = webdriver.Chrome()
 
 # 开始程序主逻辑
-while(True):
+while (True):
     if not (int(getDiff(rTimeS)) <= diff):
         l.warning("时候未到，休息1小时")
-        time.sleep(1*60*60)
+        time.sleep(1 * 60 * 60)
         break
-    m.send({"title": title, "content": content + " [" + datetime.datetime.now().date().__str__() + "]"})
-
-
-
-
-
+    b.get("https://ehall.jlu.edu.cn/infoplus/form/JLDX_BK_XNYQSB/start")
+    b.find_element_by_id("username").send_keys(uName)
+    b.find_element_by_id("password").send_keys(uPwd)
+    b.find_element_by_id("login-submit").click()
+    b.implicitly_wait(timeout)
+    b.find_element_by_name("fieldCNS").click()
+    b.implicitly_wait(timeout)
+    b.find_element_by_xpath("/html/body/div[4]/form/div/div[1]/div[2]/ul/li[1]/a").click()
+    b.implicitly_wait(timeout)
+    b.find_element_by_css_selector("button.dialog_button.default.fr").click()
+    b.implicitly_wait(timeout)
+    time.sleep(2)
+    b.find_element_by_css_selector("button.dialog_button.default.fr").click()
+    b.implicitly_wait(timeout)
+    if str(b.find_element_by_xpath("/html/body/div[4]/form/div/div[1]/div[1]/div[2]/nobr").text).find("已完成"):
+        l.warning("已完成！")
+        m.send({"title": title, "content": content + " [" + datetime.datetime.now().date().__str__() + "]"})
