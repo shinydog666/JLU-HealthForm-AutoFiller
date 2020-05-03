@@ -69,6 +69,7 @@ title = cfg.get("common", "title")
 content = cfg.get("common", "content")
 timeout = int(cfg.get("common", "timeout"))
 chromeDriver = cfg.get("common", "chromeDriver")
+sTimes = int(cfg.get("program", "sTimes"))
 
 l.info("配置内容：")
 for i in cfg.sections():
@@ -79,30 +80,41 @@ for i in cfg.sections():
 m.setMethod(method)
 m.config({methodKey: apiKey})
 
-# 配置浏览器
-b = webdriver.Chrome(executable_path=chromeDriver)
-b.minimize_window()
 # 开始程序主逻辑
 while (True):
-    b.minimize_window()
-    if not (int(getDiff(rTimeS)) <= diff):
-        l.warning("时候未到，休息1小时")
-        time.sleep(1 * 60 * 60)
-        break
-    b.get("https://ehall.jlu.edu.cn/infoplus/form/JLDX_BK_XNYQSB/start")
-    b.find_element_by_id("username").send_keys(uName)
-    b.find_element_by_id("password").send_keys(uPwd)
-    b.find_element_by_id("login-submit").click()
-    b.implicitly_wait(timeout)
-    b.find_element_by_name("fieldCNS").click()
-    b.implicitly_wait(timeout)
-    b.find_element_by_xpath("/html/body/div[4]/form/div/div[1]/div[2]/ul/li[1]/a").click()
-    b.implicitly_wait(timeout)
-    b.find_element_by_css_selector("button.dialog_button.default.fr").click()
-    b.implicitly_wait(timeout)
-    time.sleep(2)
-    b.find_element_by_css_selector("button.dialog_button.default.fr").click()
-    b.implicitly_wait(timeout)
-    if str(b.find_element_by_xpath("/html/body/div[4]/form/div/div[1]/div[1]/div[2]/nobr").text).find("已完成"):
-        l.warning("已完成！")
-        m.send({"title": title, "content": content + " [" + datetime.datetime.now().date().__str__() + "]"})
+    if int(getDiff(rTimeS)) > diff:
+        l.warning("时候未到，休息"+str(diff*2/60)+"小时。")
+        time.sleep(diff * 2 * 60)
+        continue
+    try:
+        # 配置浏览器
+        b = webdriver.Chrome(executable_path=chromeDriver)
+        b.minimize_window()
+        b.get("https://ehall.jlu.edu.cn/infoplus/form/JLDX_BK_XNYQSB/start")
+        b.find_element_by_id("username").send_keys(uName)
+        b.find_element_by_id("password").send_keys(uPwd)
+        b.find_element_by_id("login-submit").click()
+        b.implicitly_wait(timeout)
+        b.find_element_by_name("fieldCNS").click()
+        b.implicitly_wait(timeout)
+        b.find_element_by_xpath("/html/body/div[4]/form/div/div[1]/div[2]/ul/li[1]/a").click()
+        b.implicitly_wait(timeout)
+        b.find_element_by_css_selector("button.dialog_button.default.fr").click()
+        b.implicitly_wait(timeout)
+        time.sleep(2)
+        b.find_element_by_css_selector("button.dialog_button.default.fr").click()
+        b.implicitly_wait(timeout)
+        time.sleep(5)
+        if str(b.find_element_by_xpath("/html/body/div[4]/form/div/div[1]/div[1]/div[2]/nobr").text).find("已完成"):
+            l.warning("已完成！")
+            l.warning(
+                m.send({"title": title, "content": content + " [" + datetime.datetime.now().date().__str__() + "]"}))
+            cfg.set("program", "sTimes", str(++sTimes))
+            b.quit()
+
+    except:
+        l.error("页面加载出错，重试")
+        m.send({"title": "啊哦", "content": "出错了呢~" + " [" + datetime.datetime.now().date().__str__() + "]"})
+        # 我知道这里会出问题，但是连ChromeDriver都没配置好还运行个p
+        b.quit()
+        continue

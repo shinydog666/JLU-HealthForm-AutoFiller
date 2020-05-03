@@ -2,7 +2,7 @@ from email.header import Header
 from email.mime.text import MIMEText
 from urllib import parse
 import smtplib
-from requests import get,post
+import requests
 
 
 class MessageSender(object):
